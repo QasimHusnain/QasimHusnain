@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FaujiPension — Pakistan Military Pension Verification Tool</title>
+  <meta name="description" content="Free online tool to verify Pakistan Army, Navy and Air Force pension calculations. Detect underpayments and errors in your military pension." />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<!-- ─── HEADER ─────────────────────────────────────────────── -->
+<header class="site-header">
+  <div class="container">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">⭐</span>
+        <span class="logo-text" data-en="FaujiPension" data-ur="فوجی پنشن">FaujiPension</span>
+      </div>
+      <button class="lang-toggle" id="langToggle" aria-label="Switch language">
+        <span class="lang-en active-lang">EN</span>
+        <span class="lang-sep">|</span>
+        <span class="lang-ur">اردو</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ─── HERO ───────────────────────────────────────────────── -->
+<section class="hero" id="hero">
+  <div class="container">
+    <h1 class="hero-title">
+      <span data-en="Is Your Military Pension Correct?" data-ur="کیا آپ کی فوجی پنشن درست ہے؟">Is Your Military Pension Correct?</span>
+    </h1>
+    <p class="hero-sub" data-en="Free verification for Pakistan Army, Navy &amp; Air Force veterans — using official Finance Division rates." data-ur="پاکستان آرمی، نیوی اور ائیر فورس کے سابق فوجیوں کے لیے مفت تصدیق — سرکاری فنانس ڈویژن کی شرحوں کے مطابق۔">
+      Free verification for Pakistan Army, Navy &amp; Air Force veterans — using official Finance Division rates.
+    </p>
+    <a href="#tool" class="btn btn-primary btn-hero" data-en="Check My Pension — Free" data-ur="میری پنشن چیک کریں — مفت">Check My Pension — Free</a>
+    <div class="trust-pills">
+      <span class="pill" data-en="✓ 1.2M Military Pensioners" data-ur="✓ 12 لاکھ فوجی پنشنرز">✓ 1.2M Military Pensioners</span>
+      <span class="pill" data-en="✓ Official Rates 1993–2025" data-ur="✓ سرکاری شرحیں 1993–2025">✓ Official Rates 1993–2025</span>
+      <span class="pill" data-en="✓ No Registration Needed" data-ur="✓ رجسٹریشن نہیں چاہیے">✓ No Registration Needed</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CASE STUDY STRIP ───────────────────────────────────── -->
+<section class="case-strip">
+  <div class="container">
+    <div class="case-card">
+      <div class="case-label" data-en="Real Case Study" data-ur="حقیقی کیس">Real Case Study</div>
+      <div class="case-grid">
+        <div class="case-item">
+          <span class="case-key" data-en="Retired Subedar — EME Corps" data-ur="ریٹائرڈ صوبیدار — ای ایم ای کور">Retired Subedar — EME Corps</span>
+        </div>
+        <div class="case-item">
+          <span class="case-key" data-en="Was receiving:" data-ur="مل رہا تھا:">Was receiving:</span>
+          <span class="case-val wrong">Rs. 68,000/mo</span>
+        </div>
+        <div class="case-item">
+          <span class="case-key" data-en="Should receive:" data-ur="ملنا چاہیے:">Should receive:</span>
+          <span class="case-val right">Rs. 74,868/mo</span>
+        </div>
+        <div class="case-item highlight">
+          <span class="case-key" data-en="Monthly shortfall:" data-ur="ماہانہ کمی:">Monthly shortfall:</span>
+          <span class="case-val alert">Rs. 6,868</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TOOL ───────────────────────────────────────────────── -->
+<section class="tool-section" id="tool">
+  <div class="container">
+    <div class="tool-card">
+
+      <!-- Progress bar -->
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progressBar" style="width:25%"></div>
+      </div>
+      <div class="step-indicator" id="stepIndicator">
+        <span class="step-dot active" data-step="1"></span>
+        <span class="step-line"></span>
+        <span class="step-dot" data-step="2"></span>
+        <span class="step-line"></span>
+        <span class="step-dot" data-step="3"></span>
+        <span class="step-line"></span>
+        <span class="step-dot" data-step="4"></span>
+      </div>
+
+      <!-- ── STEP 1 — Service Details ── -->
+      <div class="form-step active" id="step1">
+        <h2 class="step-title" data-en="Step 1 — Service Details" data-ur="مرحلہ 1 — سروس کی تفصیلات">Step 1 — Service Details</h2>
+
+        <div class="field-group">
+          <label data-en="Service Branch" data-ur="فوجی شاخ">Service Branch</label>
+          <select id="service" required>
+            <option value="" data-en="Select service..." data-ur="شاخ منتخب کریں...">Select service...</option>
+            <option value="army" data-en="Pakistan Army" data-ur="پاکستان آرمی">Pakistan Army</option>
+            <option value="navy" data-en="Pakistan Navy" data-ur="پاکستان نیوی">Pakistan Navy</option>
+            <option value="paf" data-en="Pakistan Air Force" data-ur="پاکستان ائیر فورس">Pakistan Air Force</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label data-en="Category" data-ur="درجہ">Category</label>
+          <select id="category" required>
+            <option value="" data-en="Select category..." data-ur="درجہ منتخب کریں...">Select category...</option>
+            <option value="soldier" data-en="Soldier / OR" data-ur="سپاہی / او آر">Soldier / OR</option>
+            <option value="jco" data-en="JCO (Junior Commissioned Officer)" data-ur="جے سی او">JCO (Junior Commissioned Officer)</option>
+            <option value="officer" data-en="Officer" data-ur="آفیسر">Officer</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label data-en="Rank" data-ur="رینک">Rank</label>
+          <select id="rank" required>
+            <option value="" data-en="Select rank..." data-ur="رینک منتخب کریں...">Select rank...</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label data-en="Date of Retirement" data-ur="ریٹائرمنٹ کی تاریخ">Date of Retirement</label>
+          <div class="date-row">
+            <select id="retireMonth" required>
+              <option value="" data-en="Month" data-ur="مہینہ">Month</option>
+            </select>
+            <select id="retireYear" required>
+              <option value="" data-en="Year" data-ur="سال">Year</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-error hidden" id="step1Error"></div>
+        <div class="step-nav">
+          <button class="btn btn-primary" onclick="nextStep(1)" data-en="Next →" data-ur="اگلا →">Next →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 2 — Pension at Retirement ── -->
+      <div class="form-step" id="step2">
+        <h2 class="step-title" data-en="Step 2 — Pension at Retirement" data-ur="مرحلہ 2 — ریٹائرمنٹ پر پنشن">Step 2 — Pension at Retirement</h2>
+
+        <div class="field-group">
+          <label data-en="Do you know your gross pension at retirement?" data-ur="کیا آپ کو اپنی مجموعی پنشن معلوم ہے؟">Do you know your gross pension at retirement?</label>
+          <div class="radio-row">
+            <label class="radio-label">
+              <input type="radio" name="knowPension" value="yes" checked onchange="togglePensionMode(this.value)" />
+              <span data-en="Yes — I know it" data-ur="ہاں — معلوم ہے">Yes — I know it</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="knowPension" value="no" onchange="togglePensionMode(this.value)" />
+              <span data-en="No — enter current pension" data-ur="نہیں — موجودہ پنشن درج کریں">No — enter current pension</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="grossPensionSection">
+          <div class="field-group">
+            <label data-en="Gross Pension at Retirement (Rs.)" data-ur="مجموعی پنشن بوقت ریٹائرمنٹ (روپے)">Gross Pension at Retirement (Rs.)</label>
+            <input type="number" id="grossPension" placeholder="e.g. 2442" min="1" />
+            <p class="field-hint" data-en="Total pension shown in your PPO or pension book — before commutation." data-ur="آپ کے پی پی او یا پنشن بک میں درج مجموعی پنشن — کمیوٹیشن سے پہلے۔">Total pension shown in your PPO or pension book — before commutation.</p>
+          </div>
+        </div>
+
+        <div id="currentPensionSection" class="hidden">
+          <div class="field-group">
+            <label data-en="Current Pension Being Drawn (Rs.)" data-ur="موجودہ پنشن جو مل رہی ہے (روپے)">Current Pension Being Drawn (Rs.)</label>
+            <input type="number" id="currentPensionAlt" placeholder="e.g. 68000" min="1" />
+            <p class="field-hint" data-en="We will use this to estimate your original pension." data-ur="ہم اس سے آپ کی اصل پنشن کا اندازہ لگائیں گے۔">We will use this to estimate your original pension.</p>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label data-en="Current Pension Being Drawn (Rs.)" data-ur="موجودہ پنشن جو مل رہی ہے (روپے)">Current Pension Being Drawn (Rs.)</label>
+          <input type="number" id="currentPension" placeholder="e.g. 68000" min="1" />
+          <p class="field-hint" data-en="The amount deposited in your account each month." data-ur="ہر ماہ آپ کے اکاؤنٹ میں جمع ہونے والی رقم۔">The amount deposited in your account each month.</p>
+        </div>
+
+        <div class="field-error hidden" id="step2Error"></div>
+        <div class="step-nav">
+          <button class="btn btn-secondary" onclick="prevStep(2)" data-en="← Back" data-ur="← واپس">← Back</button>
+          <button class="btn btn-primary" onclick="nextStep(2)" data-en="Next →" data-ur="اگلا →">Next →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 3 — Commutation ── -->
+      <div class="form-step" id="step3">
+        <h2 class="step-title" data-en="Step 3 — Commutation Details" data-ur="مرحلہ 3 — کمیوٹیشن کی تفصیلات">Step 3 — Commutation Details</h2>
+
+        <div class="field-group">
+          <label data-en="Did you commute your pension?" data-ur="کیا آپ نے پنشن کمیوٹ کی؟">Did you commute your pension?</label>
+          <div class="radio-row">
+            <label class="radio-label">
+              <input type="radio" name="commuted" value="yes" onchange="toggleCommutation(this.value)" />
+              <span data-en="Yes" data-ur="ہاں">Yes</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="commuted" value="no" checked onchange="toggleCommutation(this.value)" />
+              <span data-en="No" data-ur="نہیں">No</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="commutationSection" class="hidden">
+          <div class="field-group">
+            <label data-en="Commuted Percentage" data-ur="کمیوٹیشن فیصد">Commuted Percentage</label>
+            <select id="commutedPct" onchange="calcCommutedAmount()">
+              <option value="0.25">25%</option>
+              <option value="0.35">35%</option>
+              <option value="0.50" selected>50%</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label data-en="Commuted Amount (Rs./month) — auto-calculated" data-ur="کمیوٹ شدہ رقم (روپے/ماہ) — خودکار حساب">Commuted Amount (Rs./month)</label>
+            <input type="number" id="commutedAmount" placeholder="Auto-calculated" />
+            <p class="field-hint" data-en="Calculated from gross pension × percentage. You may edit." data-ur="مجموعی پنشن × فیصد سے حساب۔ آپ تبدیل کر سکتے ہیں۔">Calculated from gross pension × percentage. You may edit.</p>
+          </div>
+
+          <div class="field-group">
+            <label data-en="Lump Sum Received (Rs.) — optional" data-ur="یکمشت رقم ملی (روپے) — اختیاری">Lump Sum Received (Rs.) — optional</label>
+            <input type="number" id="lumpSum" placeholder="e.g. 311000" />
+          </div>
+
+          <div class="field-group">
+            <label data-en="Age at Retirement (years)" data-ur="ریٹائرمنٹ کی عمر (سال)">Age at Retirement (years)</label>
+            <input type="number" id="ageAtRetirement" placeholder="e.g. 52" min="35" max="70" />
+            <p class="field-hint" data-en="Used to calculate restoration date." data-ur="بحالی کی تاریخ کے حساب کے لیے۔">Used to calculate restoration date.</p>
+          </div>
+
+          <div class="info-box" data-en="Before July 2015: Maximum commutation was 50%. After July 2015: Maximum changed to 35% for new retirees." data-ur="جولائی 2015 سے پہلے: زیادہ سے زیادہ کمیوٹیشن 50% تھی۔ جولائی 2015 کے بعد: نئے ریٹائر ہونے والوں کے لیے 35% ہو گئی۔">
+            Before July 2015: Maximum commutation was 50%. After July 2015: Maximum changed to 35% for new retirees.
+          </div>
+        </div>
+
+        <div class="field-error hidden" id="step3Error"></div>
+        <div class="step-nav">
+          <button class="btn btn-secondary" onclick="prevStep(3)" data-en="← Back" data-ur="← واپس">← Back</button>
+          <button class="btn btn-primary" onclick="nextStep(3)" data-en="Next →" data-ur="اگلا →">Next →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 4 — Restoration ── -->
+      <div class="form-step" id="step4">
+        <h2 class="step-title" data-en="Step 4 — Restoration Details" data-ur="مرحلہ 4 — بحالی کی تفصیلات">Step 4 — Restoration Details</h2>
+
+        <div id="noCommutationNote" class="info-box hidden" data-en="You indicated no commutation — restoration does not apply. Proceeding to calculation." data-ur="آپ نے کمیوٹیشن نہیں کی — بحالی لاگو نہیں ہوتی۔">
+          You indicated no commutation — restoration does not apply. Proceeding to calculation.
+        </div>
+
+        <div id="restorationSection">
+          <div class="field-group">
+            <label data-en="Has your pension been restored?" data-ur="کیا آپ کی پنشن بحال ہو گئی؟">Has your pension been restored?</label>
+            <div class="radio-row">
+              <label class="radio-label">
+                <input type="radio" name="restored" value="yes" onchange="toggleRestoration(this.value)" />
+                <span data-en="Yes — restored" data-ur="ہاں — بحال ہو گئی">Yes — restored</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="restored" value="no" checked onchange="toggleRestoration(this.value)" />
+                <span data-en="No — not yet restored" data-ur="نہیں — ابھی بحال نہیں ہوئی">No — not yet restored</span>
+              </label>
+            </div>
+          </div>
+
+          <div id="restorationDateSection" class="hidden">
+            <div class="field-group">
+              <label data-en="Restoration Date" data-ur="بحالی کی تاریخ">Restoration Date</label>
+              <div class="date-row">
+                <select id="restoreMonth">
+                  <option value="" data-en="Month" data-ur="مہینہ">Month</option>
+                </select>
+                <select id="restoreYear">
+                  <option value="" data-en="Year" data-ur="سال">Year</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div id="estimatedRestorationBox" class="info-box accent hidden">
+            <span data-en="Estimated restoration date: " data-ur="تخمینی بحالی کی تاریخ: ">Estimated restoration date: </span>
+            <strong id="estimatedRestoreDate"></strong>
+          </div>
+
+          <div id="restorationWarning" class="warning-box hidden">
+            <span id="restorationWarningText"></span>
+          </div>
+        </div>
+
+        <div class="field-error hidden" id="step4Error"></div>
+        <div class="step-nav">
+          <button class="btn btn-secondary" onclick="prevStep(4)" data-en="← Back" data-ur="← واپس">← Back</button>
+          <button class="btn btn-primary btn-calculate" onclick="calculate()" data-en="Calculate My Pension" data-ur="میری پنشن حساب کریں">Calculate My Pension</button>
+        </div>
+      </div>
+
+    </div><!-- /tool-card -->
+  </div>
+</section>
+
+<!-- ─── RESULT SCREEN ──────────────────────────────────────── -->
+<section class="result-section hidden" id="resultSection">
+  <div class="container">
+    <div class="result-card" id="resultCard">
+
+      <div class="result-header">
+        <div class="result-service" id="resultService"></div>
+        <div class="result-retire" id="resultRetire"></div>
+      </div>
+
+      <div class="verdict-box" id="verdictBox">
+        <div class="verdict-icon" id="verdictIcon"></div>
+        <div class="verdict-title" id="verdictTitle"></div>
+        <div class="verdict-amounts" id="verdictAmounts"></div>
+      </div>
+
+      <div class="result-summary" id="resultSummary"></div>
+
+      <!-- Restoration warning in result -->
+      <div class="restoration-result hidden" id="restorationResult"></div>
+
+      <!-- CTA -->
+      <div class="result-cta">
+        <div class="cta-pitch" data-en="Get the complete year-by-year breakdown, official Finance Division references, commutation verification, and a CMA-ready report." data-ur="سال بہ سال مکمل حساب، سرکاری حوالہ جات، کمیوٹیشن تصدیق، اور CMA کے لیے تیار رپورٹ حاصل کریں۔">
+          Get the complete year-by-year breakdown, official Finance Division references, commutation verification, and a CMA-ready report.
+        </div>
+        <button class="btn btn-primary btn-pdf" onclick="generatePDF()" data-en="Get Full Report — Rs. 500" data-ur="مکمل رپورٹ حاصل کریں — 500 روپے">Get Full Report — Rs. 500</button>
+        <div class="pdf-features">
+          <span data-en="✓ Year-by-year calculations" data-ur="✓ سال بہ سال حسابات">✓ Year-by-year calculations</span>
+          <span data-en="✓ Official Finance Division refs" data-ur="✓ سرکاری فنانس ڈویژن حوالہ جات">✓ Official Finance Division refs</span>
+          <span data-en="✓ Commutation verification" data-ur="✓ کمیوٹیشن تصدیق">✓ Commutation verification</span>
+          <span data-en="✓ Ready for CMA submission" data-ur="✓ CMA جمع کروانے کے لیے تیار">✓ Ready for CMA submission</span>
+        </div>
+
+        <!-- Phase 1 payment instructions -->
+        <div class="payment-instructions" id="paymentInstructions" style="display:none">
+          <h3 data-en="Payment Instructions" data-ur="ادائیگی کی ہدایات">Payment Instructions</h3>
+          <ol>
+            <li data-en="Send Rs. 500 to JazzCash: 03XX-XXXXXXX" data-ur="JazzCash نمبر 03XX-XXXXXXX پر 500 روپے بھیجیں">Send Rs. 500 to JazzCash: 03XX-XXXXXXX</li>
+            <li data-en="WhatsApp your receipt to the same number" data-ur="اسی نمبر پر واٹس ایپ پر رسید بھیجیں">WhatsApp your receipt to the same number</li>
+            <li data-en="Your PDF report will be sent within 1 hour" data-ur="آپ کی PDF رپورٹ 1 گھنٹے میں بھیج دی جائے گی">Your PDF report will be sent within 1 hour</li>
+          </ol>
+          <button class="btn btn-whatsapp" onclick="openWhatsApp()" data-en="Open WhatsApp" data-ur="واٹس ایپ کھولیں">Open WhatsApp</button>
+        </div>
+      </div>
+
+      <div class="result-actions">
+        <button class="btn btn-secondary btn-sm" onclick="shareWhatsApp()" data-en="Share on WhatsApp" data-ur="واٹس ایپ پر شیئر کریں">Share on WhatsApp</button>
+        <button class="btn btn-secondary btn-sm" onclick="startOver()" data-en="Start Over" data-ur="دوبارہ شروع کریں">Start Over</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── INCREASE HISTORY TABLE ─────────────────────────────── -->
+<section class="history-section" id="history">
+  <div class="container">
+    <h2 class="section-title" data-en="Official Pakistan Pension Increase History — 1993–2025" data-ur="سرکاری پاکستان پنشن اضافہ تاریخ — 1993–2025">Official Pakistan Pension Increase History — 1993–2025</h2>
+    <p class="section-sub" data-en="All Finance Division rates used in our calculations:" data-ur="ہمارے حسابات میں استعمال ہونے والی تمام فنانس ڈویژن شرحیں:">All Finance Division rates used in our calculations:</p>
+    <div class="table-wrap">
+      <table class="history-table" id="historyTable">
+        <thead>
+          <tr>
+            <th data-en="Year" data-ur="سال">Year</th>
+            <th data-en="Increase Rate" data-ur="اضافہ شرح">Increase Rate</th>
+            <th data-en="Finance Division Reference" data-ur="فنانس ڈویژن حوالہ">Finance Division Reference</th>
+          </tr>
+        </thead>
+        <tbody id="historyTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TRUST SECTION ──────────────────────────────────────── -->
+<section class="trust-section">
+  <div class="container">
+    <h2 class="section-title" data-en="Why Use This Tool?" data-ur="یہ ٹول کیوں استعمال کریں؟">Why Use This Tool?</h2>
+    <div class="trust-grid">
+      <div class="trust-item">
+        <div class="trust-icon">🔍</div>
+        <h3 data-en="Common Errors We Detect" data-ur="عام غلطیاں جو ہم پکڑتے ہیں">Common Errors We Detect</h3>
+        <ul>
+          <li data-en="Wrong base pension at retirement" data-ur="ریٹائرمنٹ پر غلط بنیادی پنشن">Wrong base pension at retirement</li>
+          <li data-en="Restoration applied late or not at all" data-ur="بحالی دیر سے یا بالکل نہیں ہوئی">Restoration applied late or not at all</li>
+          <li data-en="Annual increases missed or wrong rate" data-ur="سالانہ اضافہ نہیں ملا یا غلط شرح">Annual increases missed or wrong rate</li>
+          <li data-en="Commutation lump sum miscalculated" data-ur="کمیوٹیشن کی یکمشت رقم غلط">Commutation lump sum miscalculated</li>
+        </ul>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">📋</div>
+        <h3 data-en="Official Rates" data-ur="سرکاری شرحیں">Official Rates</h3>
+        <p data-en="All calculations use Finance Division Office Memoranda — the same notifications used by CMA Pensions Lahore." data-ur="تمام حسابات فنانس ڈویژن آفس میمورنڈا استعمال کرتے ہیں — وہی اطلاعات جو CMA پنشنز لاہور استعمال کرتا ہے۔">All calculations use Finance Division Office Memoranda — the same notifications used by CMA Pensions Lahore.</p>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">🔒</div>
+        <h3 data-en="Your Data Stays Private" data-ur="آپ کا ڈیٹا محفوظ رہتا ہے">Your Data Stays Private</h3>
+        <p data-en="Zero data stored. Everything runs in your browser. Nothing is sent to any server." data-ur="کوئی ڈیٹا محفوظ نہیں ہوتا۔ سب کچھ آپ کے براؤزر میں چلتا ہے۔ کوئی چیز کسی سرور کو نہیں بھیجی جاتی۔">Zero data stored. Everything runs in your browser. Nothing is sent to any server.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── DISCLAIMER ─────────────────────────────────────────── -->
+<footer class="site-footer">
+  <div class="container">
+    <p class="disclaimer" data-en="DISCLAIMER: This tool provides estimates based on publicly available Finance Division notifications. Results are for guidance only and should be verified with CMA (Pensions) Lahore before any legal proceedings. The developers accept no liability for errors or omissions." data-ur="دستبرداری: یہ ٹول صرف سرکاری طور پر دستیاب فنانس ڈویژن اطلاعات کی بنیاد پر تخمینے فراہم کرتا ہے۔ نتائج صرف رہنمائی کے لیے ہیں اور کسی بھی قانونی کارروائی سے پہلے CMA لاہور سے تصدیق کی جائے۔">
+      DISCLAIMER: This tool provides estimates based on publicly available Finance Division notifications. Results are for guidance only and should be verified with CMA (Pensions) Lahore before any legal proceedings. The developers accept no liability for errors or omissions.
+    </p>
+    <p class="footer-copy">© 2026 FaujiPension.com — <span data-en="All rights reserved." data-ur="جملہ حقوق محفوظ ہیں۔">All rights reserved.</span></p>
+  </div>
+</footer>
+
+<!-- jsPDF CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="js/calculator.js"></script>
+<script src="js/pdf.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
