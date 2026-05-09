@@ -7,16 +7,20 @@
   <meta name="description" content="Free online tool to verify Pakistan Army, Navy and Air Force pension calculations. Detect underpayments and errors in your military pension." />
   <link rel="stylesheet" href="css/styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
+<a href="#tool" class="skip-link" data-en="Skip to calculator" data-ur="کیلکولیٹر پر جائیں">Skip to calculator</a>
 
 <!-- ─── HEADER ────────────────────────────────────────────── -->
 <header class="site-header">
   <div class="container">
     <div class="header-inner">
       <div class="logo">
-        <span class="logo-icon">⭐</span>
+        <span class="logo-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </span>
         <span class="logo-text" data-en="FaujiPension" data-ur="فوجی پنشن">FaujiPension</span>
       </div>
       <button class="lang-toggle" id="langToggle" aria-label="Switch language">
@@ -81,14 +85,26 @@
       <div class="progress-wrap">
         <div class="progress-bar" id="progressBar" style="width:25%"></div>
       </div>
-      <div class="step-indicator" id="stepIndicator">
-        <span class="step-dot active" data-step="1"></span>
-        <span class="step-line"></span>
-        <span class="step-dot" data-step="2"></span>
-        <span class="step-line"></span>
-        <span class="step-dot" data-step="3"></span>
-        <span class="step-line"></span>
-        <span class="step-dot" data-step="4"></span>
+      <div class="step-indicator" id="stepIndicator" role="list" aria-label="Form progress">
+        <div class="step-item" role="listitem">
+          <span class="step-dot active" data-step="1" aria-label="Step 1: Service details"></span>
+          <span class="step-label" data-en="Service" data-ur="سروس">Service</span>
+        </div>
+        <span class="step-line" aria-hidden="true"></span>
+        <div class="step-item" role="listitem">
+          <span class="step-dot" data-step="2" aria-label="Step 2: Pension details"></span>
+          <span class="step-label" data-en="Pension" data-ur="پنشن">Pension</span>
+        </div>
+        <span class="step-line" aria-hidden="true"></span>
+        <div class="step-item" role="listitem">
+          <span class="step-dot" data-step="3" aria-label="Step 3: Commutation"></span>
+          <span class="step-label" data-en="Commute" data-ur="کمیوٹیشن">Commute</span>
+        </div>
+        <span class="step-line" aria-hidden="true"></span>
+        <div class="step-item" role="listitem">
+          <span class="step-dot" data-step="4" aria-label="Step 4: Restoration"></span>
+          <span class="step-label" data-en="Restore" data-ur="بحالی">Restore</span>
+        </div>
       </div>
 
       <!-- ── STEP 1 — Service Details ── -->
@@ -115,7 +131,7 @@
 
         <div class="field-group">
           <label data-en="Service Branch" data-ur="فوجی شاخ">Service Branch</label>
-          <select id="service" required>
+          <select id="service" required aria-label="Service branch">
             <option value="" data-en="Select service..." data-ur="شاخ منتخب کریں...">Select service...</option>
             <option value="army" data-en="Pakistan Army" data-ur="پاکستان آرمی">Pakistan Army</option>
             <option value="navy" data-en="Pakistan Navy" data-ur="پاکستان نیوی">Pakistan Navy</option>
@@ -125,7 +141,7 @@
 
         <div class="field-group">
           <label data-en="Category" data-ur="درجہ">Category</label>
-          <select id="category" required>
+          <select id="category" required aria-label="Pensioner category">
             <option value="" data-en="Select category..." data-ur="درجہ منتخب کریں...">Select category...</option>
             <option value="soldier" data-en="Soldier / OR" data-ur="سپاہی / او آر">Soldier / OR</option>
             <option value="jco" data-en="JCO (Junior Commissioned Officer)" data-ur="جے سی او">JCO (Junior Commissioned Officer)</option>
@@ -135,7 +151,7 @@
 
         <div class="field-group">
           <label data-en="Rank" data-ur="رینک">Rank</label>
-          <select id="rank" required>
+          <select id="rank" required aria-label="Rank">
             <option value="" data-en="Select rank..." data-ur="رینک منتخب کریں...">Select rank...</option>
           </select>
         </div>
@@ -495,7 +511,9 @@
     <h2 class="section-title" data-en="Why Use This Tool?" data-ur="یہ ٹول کیوں استعمال کریں؟">Why Use This Tool?</h2>
     <div class="trust-grid">
       <div class="trust-item">
-        <div class="trust-icon">🔍</div>
+        <div class="trust-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
         <h3 data-en="Common Errors We Detect" data-ur="عام غلطیاں جو ہم پکڑتے ہیں">Common Errors We Detect</h3>
         <ul>
           <li data-en="Wrong base pension at retirement" data-ur="ریٹائرمنٹ پر غلط بنیادی پنشن">Wrong base pension at retirement</li>
@@ -505,12 +523,16 @@
         </ul>
       </div>
       <div class="trust-item">
-        <div class="trust-icon">📋</div>
+        <div class="trust-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
         <h3 data-en="Official Rates" data-ur="سرکاری شرحیں">Official Rates</h3>
         <p data-en="All calculations use Finance Division Office Memoranda — the same notifications used by CMA Pensions Lahore." data-ur="تمام حسابات فنانس ڈویژن آفس میمورنڈا استعمال کرتے ہیں — وہی اطلاعات جو CMA پنشنز لاہور استعمال کرتا ہے۔">All calculations use Finance Division Office Memoranda — the same notifications used by CMA Pensions Lahore.</p>
       </div>
       <div class="trust-item">
-        <div class="trust-icon">🔒</div>
+        <div class="trust-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
         <h3 data-en="Your Data Stays Private" data-ur="آپ کا ڈیٹا محفوظ رہتا ہے">Your Data Stays Private</h3>
         <p data-en="Zero data stored. Everything runs in your browser. Nothing is sent to any server." data-ur="کوئی ڈیٹا محفوظ نہیں ہوتا۔ سب کچھ آپ کے براؤزر میں چلتا ہے۔ کوئی چیز کسی سرور کو نہیں بھیجی جاتی۔">Zero data stored. Everything runs in your browser. Nothing is sent to any server.</p>
       </div>
