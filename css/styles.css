@@ -477,7 +477,8 @@ body.urdu .step-nav { justify-content: flex-start; }
   padding: 12px 8px;
 }
 
-.verdict-amount-item.highlight {
+.verdict-amount-item.highlight,
+.verdict-amount-item.highlight-red {
   background: var(--red-l);
   border: 1.5px solid var(--red);
 }

@@ -11,7 +11,7 @@
 </head>
 <body>
 
-<!-- ─── HEADER ─────────────────────────────────────────────── -->
+<!-- ─── HEADER ────────────────────────────────────────────── -->
 <header class="site-header">
   <div class="container">
     <div class="header-inner">
@@ -28,7 +28,7 @@
   </div>
 </header>
 
-<!-- ─── HERO ───────────────────────────────────────────────── -->
+<!-- ─── HERO ──────────────────────────────────────────────── -->
 <section class="hero" id="hero">
   <div class="container">
     <h1 class="hero-title">
@@ -77,7 +77,7 @@
   <div class="container">
     <div class="tool-card">
 
-      <!-- Progress bar -->
+      <!-- Progress -->
       <div class="progress-wrap">
         <div class="progress-bar" id="progressBar" style="width:25%"></div>
       </div>
@@ -94,6 +94,24 @@
       <!-- ── STEP 1 — Service Details ── -->
       <div class="form-step active" id="step1">
         <h2 class="step-title" data-en="Step 1 — Service Details" data-ur="مرحلہ 1 — سروس کی تفصیلات">Step 1 — Service Details</h2>
+
+        <!-- Pensioner Type -->
+        <div class="field-group">
+          <label data-en="Pensioner Type" data-ur="پنشنر کی قسم">Pensioner Type</label>
+          <div class="radio-row">
+            <label class="radio-label">
+              <input type="radio" name="pensionerType" value="primary" checked onchange="onPensionerTypeChange(this.value)" />
+              <span data-en="Primary Pensioner (veteran)" data-ur="بنیادی پنشنر (سابق فوجی)">Primary Pensioner (veteran)</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="pensionerType" value="family" onchange="onPensionerTypeChange(this.value)" />
+              <span data-en="Family Pensioner (widow / dependent)" data-ur="خاندانی پنشنر (بیوہ / انحصار کنندہ)">Family Pensioner (widow / dependent)</span>
+            </label>
+          </div>
+          <p class="field-hint family-hint hidden" data-en="Family pension = 50% of the veteran's gross pension. Commutation and restoration do not apply." data-ur="خاندانی پنشن = سابق فوجی کی مجموعی پنشن کا 50%۔ کمیوٹیشن اور بحالی لاگو نہیں ہوتی۔">
+            Family pension = 50% of the veteran's gross pension. Commutation and restoration do not apply.
+          </p>
+        </div>
 
         <div class="field-group">
           <label data-en="Service Branch" data-ur="فوجی شاخ">Service Branch</label>
@@ -123,12 +141,12 @@
         </div>
 
         <div class="field-group">
-          <label data-en="Date of Retirement" data-ur="ریٹائرمنٹ کی تاریخ">Date of Retirement</label>
+          <label class="retire-date-label" data-en="Date of Retirement" data-ur="ریٹائرمنٹ کی تاریخ">Date of Retirement</label>
           <div class="date-row">
             <select id="retireMonth" required>
               <option value="" data-en="Month" data-ur="مہینہ">Month</option>
             </select>
-            <select id="retireYear" required>
+            <select id="retireYear" required onchange="onRetireYearChange()">
               <option value="" data-en="Year" data-ur="سال">Year</option>
             </select>
           </div>
@@ -140,7 +158,7 @@
         </div>
       </div>
 
-      <!-- ── STEP 2 — Pension at Retirement ── -->
+      <!-- ── STEP 2 — Pension Details ── -->
       <div class="form-step" id="step2">
         <h2 class="step-title" data-en="Step 2 — Pension at Retirement" data-ur="مرحلہ 2 — ریٹائرمنٹ پر پنشن">Step 2 — Pension at Retirement</h2>
 
@@ -153,31 +171,38 @@
             </label>
             <label class="radio-label">
               <input type="radio" name="knowPension" value="no" onchange="togglePensionMode(this.value)" />
-              <span data-en="No — enter current pension" data-ur="نہیں — موجودہ پنشن درج کریں">No — enter current pension</span>
+              <span data-en="No — use current pension" data-ur="نہیں — موجودہ پنشن استعمال کریں">No — use current pension</span>
             </label>
           </div>
         </div>
 
         <div id="grossPensionSection">
           <div class="field-group">
-            <label data-en="Gross Pension at Retirement (Rs.)" data-ur="مجموعی پنشن بوقت ریٹائرمنٹ (روپے)">Gross Pension at Retirement (Rs.)</label>
-            <input type="number" id="grossPension" placeholder="e.g. 2442" min="1" />
+            <label class="gross-pension-label" data-en="Gross Pension at Retirement (Rs.)" data-ur="مجموعی پنشن بوقت ریٹائرمنٹ (روپے)">Gross Pension at Retirement (Rs.)</label>
+            <input type="number" id="grossPension" placeholder="e.g. 2442" min="1" oninput="calcCommutedAmount()" />
             <p class="field-hint" data-en="Total pension shown in your PPO or pension book — before commutation." data-ur="آپ کے پی پی او یا پنشن بک میں درج مجموعی پنشن — کمیوٹیشن سے پہلے۔">Total pension shown in your PPO or pension book — before commutation.</p>
           </div>
         </div>
 
         <div id="currentPensionSection" class="hidden">
           <div class="field-group">
-            <label data-en="Current Pension Being Drawn (Rs.)" data-ur="موجودہ پنشن جو مل رہی ہے (روپے)">Current Pension Being Drawn (Rs.)</label>
+            <label data-en="Current Pension Being Drawn (Rs.) — for reverse calculation" data-ur="موجودہ پنشن (روپے) — الٹا حساب کے لیے">Current Pension Being Drawn (Rs.) — for reverse calculation</label>
             <input type="number" id="currentPensionAlt" placeholder="e.g. 68000" min="1" />
-            <p class="field-hint" data-en="We will use this to estimate your original pension." data-ur="ہم اس سے آپ کی اصل پنشن کا اندازہ لگائیں گے۔">We will use this to estimate your original pension.</p>
+            <p class="field-hint" data-en="We will reverse-calculate your original pension from this." data-ur="ہم اس سے آپ کی اصل پنشن کا الٹا حساب لگائیں گے۔">We will reverse-calculate your original pension from this.</p>
           </div>
         </div>
 
         <div class="field-group">
           <label data-en="Current Pension Being Drawn (Rs.)" data-ur="موجودہ پنشن جو مل رہی ہے (روپے)">Current Pension Being Drawn (Rs.)</label>
           <input type="number" id="currentPension" placeholder="e.g. 68000" min="1" />
-          <p class="field-hint" data-en="The amount deposited in your account each month." data-ur="ہر ماہ آپ کے اکاؤنٹ میں جمع ہونے والی رقم۔">The amount deposited in your account each month.</p>
+          <p class="field-hint" data-en="The amount deposited in your account each month (excluding medical allowance)." data-ur="ہر ماہ آپ کے اکاؤنٹ میں جمع ہونے والی رقم (طبی الاؤنس کے بغیر)۔">The amount deposited each month (excluding medical allowance).</p>
+        </div>
+
+        <!-- Medical Allowance — excluded from Finance Division increase base -->
+        <div class="field-group">
+          <label data-en="Medical Allowance (Rs./month) — optional" data-ur="طبی الاؤنس (روپے/ماہ) — اختیاری">Medical Allowance (Rs./month) — optional</label>
+          <input type="number" id="medicalAllowance" placeholder="e.g. 1000 or 0" min="0" value="0" />
+          <p class="field-hint" data-en="Finance Division OMs exclude medical allowance before calculating annual increases. Enter if you know it, otherwise leave 0." data-ur="فنانس ڈویژن سالانہ اضافہ لگانے سے پہلے طبی الاؤنس کو نکال دیتا ہے۔ اگر معلوم ہو تو درج کریں، ورنہ 0 رہنے دیں۔">Finance Division OMs exclude medical allowance before calculating annual increases. Enter if known, otherwise leave 0.</p>
         </div>
 
         <div class="field-error hidden" id="step2Error"></div>
@@ -191,49 +216,60 @@
       <div class="form-step" id="step3">
         <h2 class="step-title" data-en="Step 3 — Commutation Details" data-ur="مرحلہ 3 — کمیوٹیشن کی تفصیلات">Step 3 — Commutation Details</h2>
 
-        <div class="field-group">
-          <label data-en="Did you commute your pension?" data-ur="کیا آپ نے پنشن کمیوٹ کی؟">Did you commute your pension?</label>
-          <div class="radio-row">
-            <label class="radio-label">
-              <input type="radio" name="commuted" value="yes" onchange="toggleCommutation(this.value)" />
-              <span data-en="Yes" data-ur="ہاں">Yes</span>
-            </label>
-            <label class="radio-label">
-              <input type="radio" name="commuted" value="no" checked onchange="toggleCommutation(this.value)" />
-              <span data-en="No" data-ur="نہیں">No</span>
-            </label>
-          </div>
+        <!-- Family pension notice -->
+        <div id="familyCommutationNotice" class="info-box hidden" data-en="Family pension — commutation does not apply. Click Next to continue." data-ur="خاندانی پنشن — کمیوٹیشن لاگو نہیں ہوتی۔ جاری رکھنے کے لیے اگلا کلک کریں۔">
+          Family pension — commutation does not apply. Click Next to continue.
         </div>
 
-        <div id="commutationSection" class="hidden">
+        <div id="commutationFields">
           <div class="field-group">
-            <label data-en="Commuted Percentage" data-ur="کمیوٹیشن فیصد">Commuted Percentage</label>
-            <select id="commutedPct" onchange="calcCommutedAmount()">
-              <option value="0.25">25%</option>
-              <option value="0.35">35%</option>
-              <option value="0.50" selected>50%</option>
-            </select>
+            <label data-en="Did you commute your pension?" data-ur="کیا آپ نے پنشن کمیوٹ کی؟">Did you commute your pension?</label>
+            <div class="radio-row">
+              <label class="radio-label">
+                <input type="radio" name="commuted" value="yes" onchange="toggleCommutation(this.value)" />
+                <span data-en="Yes" data-ur="ہاں">Yes</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="commuted" value="no" checked onchange="toggleCommutation(this.value)" />
+                <span data-en="No" data-ur="نہیں">No</span>
+              </label>
+            </div>
           </div>
 
-          <div class="field-group">
-            <label data-en="Commuted Amount (Rs./month) — auto-calculated" data-ur="کمیوٹ شدہ رقم (روپے/ماہ) — خودکار حساب">Commuted Amount (Rs./month)</label>
-            <input type="number" id="commutedAmount" placeholder="Auto-calculated" />
-            <p class="field-hint" data-en="Calculated from gross pension × percentage. You may edit." data-ur="مجموعی پنشن × فیصد سے حساب۔ آپ تبدیل کر سکتے ہیں۔">Calculated from gross pension × percentage. You may edit.</p>
-          </div>
+          <div id="commutationSection" class="hidden">
+            <div class="field-group">
+              <label data-en="Commuted Percentage" data-ur="کمیوٹیشن فیصد">Commuted Percentage</label>
+              <select id="commutedPct" onchange="calcCommutedAmount()">
+                <option value="0.25">25%</option>
+                <option value="0.35">35%</option>
+                <option value="0.50" id="opt50pct">50% (pre-July 2015 only)</option>
+              </select>
+              <p class="field-hint" id="commutationCapNote"></p>
+            </div>
 
-          <div class="field-group">
-            <label data-en="Lump Sum Received (Rs.) — optional" data-ur="یکمشت رقم ملی (روپے) — اختیاری">Lump Sum Received (Rs.) — optional</label>
-            <input type="number" id="lumpSum" placeholder="e.g. 311000" />
-          </div>
+            <div class="field-group">
+              <label data-en="Commuted Amount (Rs./month) — auto-calculated" data-ur="کمیوٹ شدہ رقم (روپے/ماہ) — خودکار حساب">Commuted Amount (Rs./month)</label>
+              <input type="number" id="commutedAmount" placeholder="Auto-calculated — you may edit" />
+              <p class="field-hint" data-en="Gross pension × percentage. Edit if your actual figure differs." data-ur="مجموعی پنشن × فیصد۔ اگر آپ کا اصل اعداد مختلف ہے تو تبدیل کریں۔">Gross pension × percentage. Edit if your actual figure differs.</p>
+            </div>
 
-          <div class="field-group">
-            <label data-en="Age at Retirement (years)" data-ur="ریٹائرمنٹ کی عمر (سال)">Age at Retirement (years)</label>
-            <input type="number" id="ageAtRetirement" placeholder="e.g. 52" min="35" max="70" />
-            <p class="field-hint" data-en="Used to calculate restoration date." data-ur="بحالی کی تاریخ کے حساب کے لیے۔">Used to calculate restoration date.</p>
-          </div>
+            <div class="field-group">
+              <label data-en="Lump Sum Received (Rs.) — optional" data-ur="یکمشت رقم ملی (روپے) — اختیاری">Lump Sum Received (Rs.) — optional</label>
+              <input type="number" id="lumpSum" placeholder="e.g. 311000" />
+              <p class="field-hint" data-en="We will verify this against the official commutation factor." data-ur="ہم اسے سرکاری کمیوٹیشن فیکٹر سے تصدیق کریں گے۔">We will verify this against the official commutation factor.</p>
+            </div>
 
-          <div class="info-box" data-en="Before July 2015: Maximum commutation was 50%. After July 2015: Maximum changed to 35% for new retirees." data-ur="جولائی 2015 سے پہلے: زیادہ سے زیادہ کمیوٹیشن 50% تھی۔ جولائی 2015 کے بعد: نئے ریٹائر ہونے والوں کے لیے 35% ہو گئی۔">
-            Before July 2015: Maximum commutation was 50%. After July 2015: Maximum changed to 35% for new retirees.
+            <div class="field-group">
+              <label data-en="Age at Retirement (years)" data-ur="ریٹائرمنٹ کی عمر (سال)">Age at Retirement (years)</label>
+              <input type="number" id="ageAtRetirement" placeholder="e.g. 52" min="35" max="70" />
+              <p class="field-hint" data-en="Required to calculate your restoration date from the commutation table." data-ur="کمیوٹیشن ٹیبل سے بحالی کی تاریخ کے حساب کے لیے ضروری ہے۔">Required to calculate your restoration date from the commutation table.</p>
+            </div>
+
+            <div class="info-box" id="commutationRuleNote">
+              <span data-en="Before July 2015: Armed Forces maximum commutation was 50%. From July 2015 onwards: maximum is 35% for all federal pensioners (Finance Division circular 07-07-2015)." data-ur="جولائی 2015 سے پہلے: مسلح افواج کے لیے زیادہ سے زیادہ کمیوٹیشن 50% تھی۔ جولائی 2015 کے بعد: تمام وفاقی پنشنرز کے لیے 35% (فنانس ڈویژن سرکلر 07-07-2015)۔">
+                Before July 2015: Armed Forces maximum commutation was 50%. From July 2015 onwards: maximum is 35% for all federal pensioners (Finance Division circular 07-07-2015).
+              </span>
+            </div>
           </div>
         </div>
 
@@ -248,11 +284,16 @@
       <div class="form-step" id="step4">
         <h2 class="step-title" data-en="Step 4 — Restoration Details" data-ur="مرحلہ 4 — بحالی کی تفصیلات">Step 4 — Restoration Details</h2>
 
-        <div id="noCommutationNote" class="info-box hidden" data-en="You indicated no commutation — restoration does not apply. Proceeding to calculation." data-ur="آپ نے کمیوٹیشن نہیں کی — بحالی لاگو نہیں ہوتی۔">
-          You indicated no commutation — restoration does not apply. Proceeding to calculation.
+        <!-- No commutation / family pension -->
+        <div id="noCommutationNote" class="info-box hidden">
+          <span id="noCommutationText"></span>
         </div>
 
         <div id="restorationSection">
+
+          <!-- Legal phase notice -->
+          <div id="restorationPhaseNotice" class="info-box accent hidden"></div>
+
           <div class="field-group">
             <label data-en="Has your pension been restored?" data-ur="کیا آپ کی پنشن بحال ہو گئی؟">Has your pension been restored?</label>
             <div class="radio-row">
@@ -282,8 +323,7 @@
           </div>
 
           <div id="estimatedRestorationBox" class="info-box accent hidden">
-            <span data-en="Estimated restoration date: " data-ur="تخمینی بحالی کی تاریخ: ">Estimated restoration date: </span>
-            <strong id="estimatedRestoreDate"></strong>
+            <strong id="estimatedRestoreDateText"></strong>
           </div>
 
           <div id="restorationWarning" class="warning-box hidden">
@@ -320,7 +360,6 @@
 
       <div class="result-summary" id="resultSummary"></div>
 
-      <!-- Restoration warning in result -->
       <div class="restoration-result hidden" id="restorationResult"></div>
 
       <!-- CTA -->
@@ -332,11 +371,10 @@
         <div class="pdf-features">
           <span data-en="✓ Year-by-year calculations" data-ur="✓ سال بہ سال حسابات">✓ Year-by-year calculations</span>
           <span data-en="✓ Official Finance Division refs" data-ur="✓ سرکاری فنانس ڈویژن حوالہ جات">✓ Official Finance Division refs</span>
-          <span data-en="✓ Commutation verification" data-ur="✓ کمیوٹیشن تصدیق">✓ Commutation verification</span>
+          <span data-en="✓ Commutation &amp; restoration verification" data-ur="✓ کمیوٹیشن اور بحالی تصدیق">✓ Commutation &amp; restoration verification</span>
           <span data-en="✓ Ready for CMA submission" data-ur="✓ CMA جمع کروانے کے لیے تیار">✓ Ready for CMA submission</span>
         </div>
 
-        <!-- Phase 1 payment instructions -->
         <div class="payment-instructions" id="paymentInstructions" style="display:none">
           <h3 data-en="Payment Instructions" data-ur="ادائیگی کی ہدایات">Payment Instructions</h3>
           <ol>
@@ -406,7 +444,7 @@
   </div>
 </section>
 
-<!-- ─── DISCLAIMER ─────────────────────────────────────────── -->
+<!-- ─── FOOTER ─────────────────────────────────────────────── -->
 <footer class="site-footer">
   <div class="container">
     <p class="disclaimer" data-en="DISCLAIMER: This tool provides estimates based on publicly available Finance Division notifications. Results are for guidance only and should be verified with CMA (Pensions) Lahore before any legal proceedings. The developers accept no liability for errors or omissions." data-ur="دستبرداری: یہ ٹول صرف سرکاری طور پر دستیاب فنانس ڈویژن اطلاعات کی بنیاد پر تخمینے فراہم کرتا ہے۔ نتائج صرف رہنمائی کے لیے ہیں اور کسی بھی قانونی کارروائی سے پہلے CMA لاہور سے تصدیق کی جائے۔">
@@ -416,7 +454,6 @@
   </div>
 </footer>
 
-<!-- jsPDF CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="js/calculator.js"></script>
 <script src="js/pdf.js"></script>
