@@ -508,6 +508,52 @@ body.urdu .step-nav { justify-content: flex-start; }
   color: var(--red);
 }
 
+.two-phase-result {
+  padding: 16px 24px 20px;
+  background: var(--green-l);
+  border-bottom: 1px solid var(--border);
+}
+
+.two-phase-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.tp-item {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tp-item.tp-highlight {
+  border-color: var(--green);
+  background: var(--green-l);
+}
+
+.tp-label { font-size: .78rem; color: var(--gray); }
+.tp-value { font-size: 1rem; font-weight: 700; color: var(--gray-d); }
+.tp-value.tp-green { color: var(--green); }
+
+.warning-inline {
+  margin-top: 10px;
+  font-size: .82rem;
+  color: #92400e;
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+@media (max-width: 500px) {
+  .two-phase-grid { grid-template-columns: 1fr; }
+}
+
 .result-cta {
   padding: 24px;
   text-align: center;

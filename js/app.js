@@ -89,8 +89,10 @@ function applyLang() {
 function t(enText, urText) { return lang === 'ur' ? urText : enText; }
 
 // ── Month / Year dropdowns ─────────────────────────────────
+const MONTH_DROPDOWN_IDS = ['retireMonth', 'restoreMonth', 'veteranRetireMonth'];
+
 function initMonthDropdowns() {
-  ['retireMonth', 'restoreMonth'].forEach(id => {
+  MONTH_DROPDOWN_IDS.forEach(id => {
     const sel = document.getElementById(id);
     if (!sel) return;
     sel.innerHTML = `<option value="">${t('Month', 'مہینہ')}</option>`;
@@ -106,7 +108,7 @@ function initMonthDropdowns() {
 }
 
 function rebuildMonthDropdowns() {
-  ['retireMonth', 'restoreMonth'].forEach(id => {
+  MONTH_DROPDOWN_IDS.forEach(id => {
     const sel = document.getElementById(id);
     if (!sel) return;
     const cur = sel.value;
@@ -119,11 +121,11 @@ function rebuildMonthDropdowns() {
 
 function initYearDropdowns() {
   const currentYear = new Date().getFullYear();
-  ['retireYear', 'restoreYear'].forEach(id => {
+  ['retireYear', 'restoreYear', 'veteranRetireYear'].forEach(id => {
     const sel = document.getElementById(id);
     if (!sel) return;
     sel.innerHTML = `<option value="">${t('Year', 'سال')}</option>`;
-    for (let y = currentYear - 1; y >= 1970; y--) {
+    for (let y = currentYear - 1; y >= 1960; y--) {
       const opt = document.createElement('option');
       opt.value = y;
       opt.textContent = y;
@@ -150,25 +152,25 @@ function updateRanks() {
 function onPensionerTypeChange(val) {
   const isFamily = val === 'family';
   document.querySelector('.family-hint').classList.toggle('hidden', !isFamily);
+  document.getElementById('primaryStep2').classList.toggle('hidden', isFamily);
+  document.getElementById('familyStep2').classList.toggle('hidden', !isFamily);
 
-  // Update date label
+  // Update Step 1 date label
   const lbl = document.querySelector('.retire-date-label');
   if (lbl) {
-    lbl.setAttribute('data-en', isFamily ? 'Date Family Pension Started' : 'Date of Retirement');
-    lbl.setAttribute('data-ur', isFamily ? 'خاندانی پنشن شروع ہونے کی تاریخ' : 'ریٹائرمنٹ کی تاریخ');
-    lbl.textContent = isFamily
-      ? t('Date Family Pension Started', 'خاندانی پنشن شروع ہونے کی تاریخ')
-      : t('Date of Retirement', 'ریٹائرمنٹ کی تاریخ');
+    const enTxt = isFamily ? 'Date of Death / Family Pension Start' : 'Date of Retirement';
+    const urTxt = isFamily ? 'وفات کی تاریخ / خاندانی پنشن شروع' : 'ریٹائرمنٹ کی تاریخ';
+    lbl.setAttribute('data-en', enTxt);
+    lbl.setAttribute('data-ur', urTxt);
+    lbl.textContent = t(enTxt, urTxt);
   }
+}
 
-  const grossLbl = document.querySelector('.gross-pension-label');
-  if (grossLbl) {
-    grossLbl.setAttribute('data-en', isFamily ? 'Family Pension at Grant Date (Rs.)' : 'Gross Pension at Retirement (Rs.)');
-    grossLbl.setAttribute('data-ur', isFamily ? 'اجازت کی تاریخ پر خاندانی پنشن (روپے)' : 'مجموعی پنشن بوقت ریٹائرمنٹ (روپے)');
-    grossLbl.textContent = isFamily
-      ? t('Family Pension at Grant Date (Rs.)', 'اجازت کی تاریخ پر خاندانی پنشن (روپے)')
-      : t('Gross Pension at Retirement (Rs.)', 'مجموعی پنشن بوقت ریٹائرمنٹ (روپے)');
-  }
+// ── Family verification mode toggle ───────────────────────
+function onFamilyModeChange(val) {
+  const isTwoPhase = val === 'twoPhase';
+  document.getElementById('veteranDetailsSection').classList.toggle('hidden', !isTwoPhase);
+  document.getElementById('familyGrantSection').classList.toggle('hidden', isTwoPhase);
 }
 
 // ── Retirement year change — update commutation cap ────────
@@ -397,16 +399,35 @@ function validateStep(step) {
   }
 
   if (step === 2) {
-    const knowPension = document.querySelector('input[name="knowPension"]:checked').value;
-    if (knowPension === 'yes') {
-      const gp = parseFloat(document.getElementById('grossPension').value);
-      if (!gp || gp <= 0)
-        return err(t('Please enter your gross pension at retirement.', 'براہ کرم ریٹائرمنٹ پر مجموعی پنشن درج کریں۔'));
+    const pensionerType = document.querySelector('input[name="pensionerType"]:checked').value;
+    const isFamily = pensionerType === 'family';
+
+    if (isFamily) {
+      const mode = document.querySelector('input[name="familyVerifyMode"]:checked').value;
+      if (mode === 'twoPhase') {
+        if (!document.getElementById('veteranRetireMonth').value || !document.getElementById('veteranRetireYear').value)
+          return err(t("Please enter the veteran's date of military retirement.", 'براہ کرم سابق فوجی کی فوجی ریٹائرمنٹ کی تاریخ درج کریں۔'));
+        const vgp = parseFloat(document.getElementById('veteranGrossPension').value);
+        if (!vgp || vgp <= 0)
+          return err(t("Please enter the veteran's gross pension at retirement.", 'براہ کرم سابق فوجی کی مجموعی پنشن درج کریں۔'));
+        const vetYear  = parseInt(document.getElementById('veteranRetireYear').value);
+        const deathYear = parseInt(document.getElementById('retireYear').value);
+        if (vetYear >= deathYear)
+          return err(t("Veteran's retirement date must be before the death / family pension start date (Step 1).", 'سابق فوجی کی ریٹائرمنٹ کی تاریخ وفات / خاندانی پنشن شروع (مرحلہ 1) سے پہلے ہونی چاہیے۔'));
+      }
     } else {
-      const cp = parseFloat(document.getElementById('currentPensionAlt').value);
-      if (!cp || cp <= 0)
-        return err(t('Please enter your current pension for reverse calculation.', 'براہ کرم الٹا حساب کے لیے موجودہ پنشن درج کریں۔'));
+      const knowPension = document.querySelector('input[name="knowPension"]:checked').value;
+      if (knowPension === 'yes') {
+        const gp = parseFloat(document.getElementById('grossPension').value);
+        if (!gp || gp <= 0)
+          return err(t('Please enter your gross pension at retirement.', 'براہ کرم ریٹائرمنٹ پر مجموعی پنشن درج کریں۔'));
+      } else {
+        const cp = parseFloat(document.getElementById('currentPensionAlt').value);
+        if (!cp || cp <= 0)
+          return err(t('Please enter your current pension for reverse calculation.', 'براہ کرم الٹا حساب کے لیے موجودہ پنشن درج کریں۔'));
+      }
     }
+
     const cp = parseFloat(document.getElementById('currentPension').value);
     if (!cp || cp <= 0)
       return err(t('Please enter your current pension being drawn.', 'براہ کرم موجودہ ماہانہ پنشن درج کریں۔'));
@@ -437,22 +458,56 @@ function calculate() {
   const pensionerType = document.querySelector('input[name="pensionerType"]:checked').value;
   const isFamily      = pensionerType === 'family';
 
-  const retireMonth = parseInt(document.getElementById('retireMonth').value);
-  const retireYear  = parseInt(document.getElementById('retireYear').value);
+  // Step 1 date: for family = death/grant date; for primary = retirement date
+  const step1Month = parseInt(document.getElementById('retireMonth').value);
+  const step1Year  = parseInt(document.getElementById('retireYear').value);
 
-  const knowPension = document.querySelector('input[name="knowPension"]:checked').value;
-  let grossPension;
-  if (knowPension === 'yes') {
-    grossPension = parseFloat(document.getElementById('grossPension').value);
+  const currentPension   = parseFloat(document.getElementById('currentPension').value);
+  const medicalAllowance = parseFloat(document.getElementById('medicalAllowance').value) || 0;
+
+  let retireMonth, retireYear, grossPension;
+  let deathMonth = null, deathYear = null;
+  let familyPensionPct = 0.50;
+  let familyMode = null;
+  let knowPension = 'yes';
+
+  if (isFamily) {
+    familyMode       = document.querySelector('input[name="familyVerifyMode"]:checked').value;
+    familyPensionPct = parseFloat(document.getElementById('familyPensionPct').value) || 0.50;
+
+    if (familyMode === 'twoPhase') {
+      // Two-phase: veteran's military retirement date from Step 2
+      retireMonth  = parseInt(document.getElementById('veteranRetireMonth').value);
+      retireYear   = parseInt(document.getElementById('veteranRetireYear').value);
+      grossPension = parseFloat(document.getElementById('veteranGrossPension').value);
+      deathMonth   = step1Month;
+      deathYear    = step1Year;
+    } else {
+      // Single-phase: death/grant date is the pension start
+      retireMonth = step1Month;
+      retireYear  = step1Year;
+      const grantAmt = parseFloat(document.getElementById('familyPensionGrant').value);
+      if (grantAmt > 0) {
+        grossPension = grantAmt;
+        knowPension  = 'yes';
+      } else {
+        grossPension = estimateGrossFromCurrent(currentPension, retireYear, retireMonth);
+        knowPension  = 'no';
+      }
+    }
   } else {
-    grossPension = estimateGrossFromCurrent(
-      parseFloat(document.getElementById('currentPensionAlt').value),
-      retireYear, retireMonth
-    );
+    retireMonth = step1Month;
+    retireYear  = step1Year;
+    knowPension = document.querySelector('input[name="knowPension"]:checked').value;
+    if (knowPension === 'yes') {
+      grossPension = parseFloat(document.getElementById('grossPension').value);
+    } else {
+      grossPension = estimateGrossFromCurrent(
+        parseFloat(document.getElementById('currentPensionAlt').value),
+        retireYear, retireMonth
+      );
+    }
   }
-
-  const currentPension    = parseFloat(document.getElementById('currentPension').value);
-  const medicalAllowance  = parseFloat(document.getElementById('medicalAllowance').value) || 0;
 
   // Commutation (primary only)
   const commuted       = !isFamily && document.querySelector('input[name="commuted"]:checked').value === 'yes';
@@ -461,10 +516,10 @@ function calculate() {
   const ageAtRetirement= commuted ? (parseInt(document.getElementById('ageAtRetirement').value) || null) : null;
 
   // Restoration (primary commuted only)
-  const restoredField  = document.querySelector('input[name="restored"]:checked');
-  const restored       = commuted && restoredField && restoredField.value === 'yes';
-  const restoreMonth   = restored ? (parseInt(document.getElementById('restoreMonth').value) || null) : null;
-  const restoreYear    = restored ? (parseInt(document.getElementById('restoreYear').value)  || null) : null;
+  const restoredField = document.querySelector('input[name="restored"]:checked');
+  const restored      = commuted && restoredField && restoredField.value === 'yes';
+  const restoreMonth  = restored ? (parseInt(document.getElementById('restoreMonth').value) || null) : null;
+  const restoreYear   = restored ? (parseInt(document.getElementById('restoreYear').value)  || null) : null;
 
   calcResult = calculatePension({
     pensionerType,
@@ -479,15 +534,21 @@ function calculate() {
     restoreYear,
     restoreMonth,
     currentPension,
-    medicalAllowance
+    medicalAllowance,
+    deathYear,
+    deathMonth,
+    familyPensionPct
   });
 
-  // Attach UI metadata for display and PDF
+  // Metadata for display and PDF
   calcResult.meta = {
     pensionerType,
-    service:   document.getElementById('service').value,
-    category:  document.getElementById('category').value,
-    rank:      document.getElementById('rank').value,
+    familyMode,
+    familyPensionPct,
+    deathMonth, deathYear,
+    service:  document.getElementById('service').value,
+    category: document.getElementById('category').value,
+    rank:     document.getElementById('rank').value,
     serviceLabel:  document.getElementById('service').options[document.getElementById('service').selectedIndex]?.text,
     categoryLabel: document.getElementById('category').options[document.getElementById('category').selectedIndex]?.text,
     rankLabel:     document.getElementById('rank').options[document.getElementById('rank').selectedIndex]?.text,
@@ -524,8 +585,14 @@ function showResult(r) {
     ? t('Family Pension', 'خاندانی پنشن')
     : m.categoryLabel || m.category;
   document.getElementById('resultService').textContent = `${m.serviceLabel} — ${m.rankLabel} (${typeLabel})`;
-  document.getElementById('resultRetire').textContent  =
-    `${t('Retired/Started:', 'ریٹائرڈ/شروع:')} ${monthName(m.retireMonth, lang)} ${m.retireYear}`;
+  let retireLabel;
+  if (r.twoPhase) {
+    retireLabel = `${t('Veteran retired:', 'سابق فوجی ریٹائر:')} ${monthName(m.retireMonth, lang)} ${m.retireYear}` +
+                  ` · ${t('Family pension from:', 'خاندانی پنشن سے:')} ${monthName(m.deathMonth, lang)} ${m.deathYear}`;
+  } else {
+    retireLabel = `${t('Retired/Started:', 'ریٹائرڈ/شروع:')} ${monthName(m.retireMonth, lang)} ${m.retireYear}`;
+  }
+  document.getElementById('resultRetire').textContent = retireLabel;
 
   // Verdict
   const vBox  = document.getElementById('verdictBox');
@@ -575,6 +642,33 @@ function showResult(r) {
     summaryEl.innerHTML = `<p>${t('Your current pension matches our calculation within the rounding tolerance of Rs. 100.','آپ کی موجودہ پنشن 100 روپے کی حد میں ہمارے حساب سے ملتی ہے۔')}</p>`;
   } else {
     summaryEl.innerHTML = `<p>${t('Your pension appears higher than calculated. Please verify with CMA directly.','آپ کی پنشن حساب سے زیادہ معلوم ہوتی ہے۔ براہ کرم CMA سے براہ راست تصدیق کریں۔')}</p>`;
+  }
+
+  // Two-phase result block
+  const tpEl = document.getElementById('twoPhaseResult');
+  tpEl.classList.add('hidden');
+  if (r.twoPhase) {
+    tpEl.classList.remove('hidden');
+    const pct = (r.familyPensionPct * 100).toFixed(0);
+    const deathStr = `${monthName(r.phase2Trail[0].month, lang)} ${r.phase2Trail[0].year}`;
+    tpEl.innerHTML = `
+      <h3 style="margin:0 0 10px;font-size:1rem;color:#0f7b4f">${t('Two-Phase Calculation Summary', 'دو مرحلہ حساب کا خلاصہ')}</h3>
+      <div class="two-phase-grid">
+        <div class="tp-item">
+          <span class="tp-label">${t("Veteran's pension at death", 'سابق فوجی کی پنشن بوقت وفات')}</span>
+          <span class="tp-value">${formatRs(r.veteranPensionAtDeath)}</span>
+        </div>
+        <div class="tp-item">
+          <span class="tp-label">${t('Family pension at grant', 'منظوری پر خاندانی پنشن')} (${pct}%)</span>
+          <span class="tp-value">${formatRs(r.familyPensionStart)}</span>
+        </div>
+        <div class="tp-item tp-highlight">
+          <span class="tp-label">${t('Calculated family pension today', 'آج کی حساب کردہ خاندانی پنشن')}</span>
+          <span class="tp-value tp-green">${formatRs(r.correctPension)}</span>
+        </div>
+      </div>
+      ${r.pre1994Warning ? `<p class="warning-inline"><strong>⚠️</strong> ${t('Veteran retired before 1994 — Finance Division OMs before 1994 are not on official record. Pre-1994 years treated as 0% increase (conservative).', 'سابق فوجی 1994 سے پہلے ریٹائر ہوئے — 1994 سے پہلے کی فنانس ڈویژن شرحیں سرکاری ریکارڈ پر نہیں — 0% فرض کی گئیں (محتاط تخمینہ)۔')}</p>` : ''}
+    `;
   }
 
   // Restoration result block

@@ -56,9 +56,13 @@ function generateFullPDF(result, meta) {
     doc.line(margin, y, W-margin, y); return y+5;
   }
 
-  const isFamily = result.pensionerType === 'family';
-  const retireStr = `${MONTHS_EN[(meta.retireMonth||1)-1]} ${meta.retireYear}`;
-  const typeLabel = isFamily ? 'Family Pension (Widow/Dependent)' : `${meta.categoryLabel} — ${meta.rankLabel}`;
+  const isFamily   = result.pensionerType === 'family';
+  const isTwoPhase = result.twoPhase === true;
+  const retireStr  = `${MONTHS_EN[(meta.retireMonth||1)-1]} ${meta.retireYear}`;
+  const deathStr   = isTwoPhase ? `${MONTHS_EN[(meta.deathMonth||1)-1]} ${meta.deathYear}` : null;
+  const typeLabel  = isFamily
+    ? (isTwoPhase ? `Family Pension — ${(result.familyPensionPct*100).toFixed(0)}% (Two-Phase Verification)` : 'Family Pension (Widow/Dependent)')
+    : `${meta.categoryLabel} — ${meta.rankLabel}`;
 
   // ══ PAGE 1 — COVER ════════════════════════════════════════
   pageHeader(1);
@@ -74,13 +78,17 @@ function generateFullPDF(result, meta) {
   doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
   setColor('#1f2937');
   let y = 88;
-  [
+  const coverRows = [
     ['Service:', meta.serviceLabel || ''],
     ['Type:', typeLabel],
-    ['Retirement / Pension Start:', retireStr],
+    isTwoPhase
+      ? ['Veteran Retired:', retireStr]
+      : ['Retirement / Pension Start:', retireStr],
+    ...(isTwoPhase ? [['Family Pension From:', deathStr]] : []),
     ['Reference No:', refNo],
     ['Generated:', today]
-  ].forEach(([l,v]) => {
+  ];
+  coverRows.forEach(([l,v]) => {
     doc.setFont('helvetica','bold'); setColor('#6b7280'); doc.text(l, margin+10, y);
     doc.setFont('helvetica','normal'); setColor('#1f2937'); doc.text(v, margin+65, y);
     y += 9;
@@ -105,7 +113,13 @@ function generateFullPDF(result, meta) {
   doc.addPage(); pageHeader(2); y = 26;
   y = secTitle('VERIFICATION SUMMARY', y);
 
-  y = dataRow('Gross Pension at Start Date', formatRs(result.grossPension), y);
+  if (isTwoPhase) {
+    y = dataRow("Veteran's Gross Pension at Retirement", formatRs(result.grossPension), y);
+    y = dataRow("Veteran's Pension at Death / Grant Date", formatRs(result.veteranPensionAtDeath), y);
+    y = dataRow(`Family Pension at Grant (${(result.familyPensionPct*100).toFixed(0)}%)`, formatRs(result.familyPensionStart), y, '#e6f4ee');
+  } else {
+    y = dataRow('Gross Pension at Start Date', formatRs(result.grossPension), y);
+  }
   if (!isFamily && result.commutedAmount > 0) {
     y = dataRow('Commuted Monthly Amount', formatRs(result.commutedAmount), y);
     y = dataRow('Retained Pension (after commutation)', formatRs(result.retainedPension), y);
@@ -155,14 +169,28 @@ function generateFullPDF(result, meta) {
   } else {
     y = secTitle('FAMILY PENSION NOTE', y);
     doc.setFont('helvetica','normal'); doc.setFontSize(8.5); setColor('#1f2937');
-    const note = 'Family pension = 50% of the veteran\'s gross pension at time of grant. Commutation and restoration do not apply to family pension. All Finance Division annual increases apply in full.';
+    let note;
+    if (isTwoPhase) {
+      note = `Two-phase verification: Phase 1 traces the veteran's pension from retirement (${retireStr}) to death (${deathStr}) — result Rs. ${result.veteranPensionAtDeath.toLocaleString('en-PK')}/month. Phase 2 applies ${(result.familyPensionPct*100).toFixed(0)}% family pension rate and all subsequent Finance Division increases from ${deathStr} to 2026. Commutation and restoration do not apply to family pension.`;
+      if (result.pre1994Warning) note += ' WARNING: Veteran retired before 1994 — Finance Division OMs for years before 1994 are not on official record; pre-1994 years assumed 0% increase (conservative estimate).';
+    } else {
+      note = `Family pension = ${(result.familyPensionPct||0.5)*100}% of the veteran's gross pension at time of grant. Commutation and restoration do not apply to family pension. All Finance Division annual increases apply in full.`;
+    }
     const lines = doc.splitTextToSize(note, innerW-6);
     doc.text(lines, margin+3, y); y += lines.length * 5 + 4;
   }
 
   // ══ PAGE 3 — YEAR-BY-YEAR TRAIL ═══════════════════════════
   doc.addPage(); pageHeader(3); y = 26;
-  y = secTitle('PENSION REVISION TRAIL', y);
+  y = secTitle(isTwoPhase ? 'PENSION REVISION TRAIL — TWO-PHASE' : 'PENSION REVISION TRAIL', y);
+
+  // Phase 1 header for two-phase
+  if (isTwoPhase) {
+    setFill('#1d4ed8'); doc.rect(margin, y-2, innerW, 7, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(8.5); setColor('#ffffff');
+    doc.text(`PHASE 1: Veteran's Pension Trail (${retireStr} → ${deathStr})`, margin+3, y+3);
+    y += 12; setColor('#000000');
+  }
 
   // Table header
   setFill('#085c3a'); doc.rect(margin, y-4, innerW, 7, 'F');
@@ -174,16 +202,36 @@ function generateFullPDF(result, meta) {
   y += 7;
 
   let rowIdx = 0;
+  let phase2HeaderPrinted = false;
+
   for (const entry of result.trail) {
     if (y > 270) {
       doc.addPage(); pageHeader('3+'); y = 26;
+      // Reprint table header on new page
+      setFill('#085c3a'); doc.rect(margin, y-4, innerW, 7, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(7.5); setColor('#ffffff');
+      doc.text('Year', margin+3, y); doc.text('Event', margin+22, y);
+      doc.text('Rate', margin+115, y); doc.text('Pension (Rs.)', W-margin-2, y, {align:'right'});
+      y += 7; setColor('#000000');
     }
+
+    // Print Phase 2 header banner before the transition row
+    if (isTwoPhase && entry.phase === 2 && entry.isTransition && !phase2HeaderPrinted) {
+      phase2HeaderPrinted = true;
+      y += 4;
+      setFill('#c9a227'); doc.rect(margin, y-2, innerW, 7, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(8.5); setColor('#ffffff');
+      doc.text(`PHASE 2: Family Pension Trail — ${(result.familyPensionPct*100).toFixed(0)}% (${deathStr} → 2026)`, margin+3, y+3);
+      y += 12; setColor('#000000');
+    }
+
     if (rowIdx % 2 === 0) { setFill('#f3f4f6'); doc.rect(margin, y-4, innerW, 6, 'F'); }
-    if (entry.isRestoration) { setFill('#e6f4ee'); doc.rect(margin, y-4, innerW, 6, 'F'); }
-    if (entry.unconfirmed)   { setFill('#fdf6e3'); doc.rect(margin, y-4, innerW, 6, 'F'); }
+    if (entry.isRestoration || entry.isTransition) { setFill('#e6f4ee'); doc.rect(margin, y-4, innerW, 6, 'F'); }
+    if (entry.unconfirmed || entry.preRates) { setFill('#fdf6e3'); doc.rect(margin, y-4, innerW, 6, 'F'); }
 
     doc.setFont('helvetica','normal'); doc.setFontSize(7.5); setColor('#1f2937');
-    doc.text(String(entry.year) + (entry.unconfirmed ? ' ⚠' : ''), margin+3, y);
+    const yearLabel = String(entry.year) + (entry.unconfirmed || entry.preRates ? ' ⚠' : '');
+    doc.text(yearLabel, margin+3, y);
     doc.text((entry.event||'').substring(0,46), margin+22, y);
     const rateStr = entry.rate===null ? '—' : entry.rate===0 ? '0%' : `${(entry.rate*100).toFixed(1)}%`;
     doc.text(rateStr, margin+115, y);
@@ -269,17 +317,31 @@ function generateFullPDF(result, meta) {
     'Pension Branch, Lahore Cantt',
     '',
     `Subject: ${isFamily ? 'Family Pension' : 'Pension'} Verification — ${meta.serviceLabel}, ${meta.rankLabel}`,
-    `         Retired/Started: ${retireStr}`,
+    `         ${isTwoPhase ? `Veteran Retired: ${retireStr}  |  Family Pension From: ${deathStr}` : `Retired/Started: ${retireStr}`}`,
     '',
     'With due respect it is stated that:',
     '',
-    `1. The undersigned retired from ${meta.serviceLabel} in the rank of ${meta.rankLabel}`,
-    `   with effect from ${retireStr}.`,
+    isTwoPhase
+      ? `1. The veteran retired from ${meta.serviceLabel} in the rank of ${meta.rankLabel} on ${retireStr}.`
+      : `1. The undersigned retired from ${meta.serviceLabel} in the rank of ${meta.rankLabel}`,
+    isTwoPhase
+      ? `   The undersigned (widow/dependent) has been drawing family pension from ${deathStr}.`
+      : `   with effect from ${retireStr}.`,
     '',
-    `2. ${isFamily ? 'Family pension' : 'Gross pension'} at start date: ${formatRs(result.grossPension)}/month.`,
+    isTwoPhase
+      ? `2. Veteran's gross pension at retirement: ${formatRs(result.grossPension)}/month.`
+      : `2. ${isFamily ? 'Family pension' : 'Gross pension'} at start date: ${formatRs(result.grossPension)}/month.`,
+    ...(isTwoPhase ? [
+      `   Veteran's calculated pension at death: ${formatRs(result.veteranPensionAtDeath)}/month.`,
+      `   Family pension at grant (${(result.familyPensionPct*100).toFixed(0)}%): ${formatRs(result.familyPensionStart)}/month.`
+    ] : []),
     '',
     `3. A verification has been conducted using official Finance Division`,
     `   Office Memoranda for the period ${meta.retireYear} to 2026.`,
+    ...(isTwoPhase && result.pre1994Warning ? [
+      '   NOTE: Finance Division OMs before 1994 are not on official record;',
+      '   pre-1994 years are conservatively treated as 0% increase.'
+    ] : []),
     '',
     result.status === 'underpaid'
       ? `4. Calculation indicates a monthly shortfall of ${formatRs(result.monthlyShortfall)}`

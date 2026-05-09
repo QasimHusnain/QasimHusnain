@@ -177,12 +177,25 @@ function calculatePension(p) {
     restoreYear,
     restoreMonth,
     currentPension,
-    medicalAllowance = 0
+    medicalAllowance = 0,
+    deathYear  = null,
+    deathMonth = null,
+    familyPensionPct = 0.50
   } = p;
+
+  const isFamily = pensionerType === 'family';
+
+  // Two-phase family pension: veteran trail → death → family pension trail
+  if (isFamily && deathYear && deathMonth) {
+    return calculateTwoPhaseFamilyPension({
+      grossPension, retireYear, retireMonth,
+      deathYear, deathMonth, familyPensionPct,
+      currentPension, medicalAllowance
+    });
+  }
 
   const CURRENT_YEAR = 2026;
   const trail = [];
-  const isFamily = pensionerType === 'family';
 
   // Family pension: no commutation, no restoration — just apply increases to gross
   const retainedPension = (commuted && !isFamily) ? (grossPension - commutedAmount) : grossPension;
@@ -341,6 +354,136 @@ function monthName(monthNum, lang) {
   const idx = parseInt(monthNum) - 1;
   if (idx < 0 || idx > 11) return '?';
   return lang === 'ur' ? MONTHS_UR[idx] : MONTHS_EN[idx];
+}
+
+// ─────────────────────────────────────────────────────────────
+/**
+ * Two-phase family pension engine.
+ *
+ * Phase 1: Apply Finance Division increases to veteran's gross pension
+ *          from military retirement → death.
+ * Phase 2: Family pension (grossAtDeath × familyPensionPct) gets
+ *          Finance Division increases from death → 2026.
+ *
+ * Pre-1994 years have no FD OM on record — treated as 0% (conservative).
+ */
+function calculateTwoPhaseFamilyPension({
+  grossPension, retireYear, retireMonth,
+  deathYear, deathMonth, familyPensionPct,
+  currentPension, medicalAllowance
+}) {
+  const CURRENT_YEAR = 2026;
+  const phase1Trail  = [];
+  const phase2Trail  = [];
+  const pre1994Warning = retireYear < 1994;
+
+  // ── Phase 1: veteran's pension trail ─────────────────────
+  let vetPension = grossPension;
+
+  phase1Trail.push({
+    year: retireYear, month: retireMonth,
+    event: 'Veteran retired — base pension',
+    rate: null,
+    pension: Math.round(vetPension),
+    phase: 1,
+    note: "Veteran's gross pension at military retirement"
+  });
+
+  for (let year = retireYear + 1; year <= deathYear; year++) {
+    const isPreRates = year < 1994;
+    const rate = isPreRates ? 0 : (PENSION_RATES[year] ?? 0);
+
+    if (!isPreRates && rate > 0) {
+      const base = Math.max(0, vetPension - medicalAllowance);
+      vetPension  = medicalAllowance + base * (1 + rate);
+    }
+
+    phase1Trail.push({
+      year,
+      event: isPreRates
+        ? 'Pre-1994 — rate not on official record'
+        : (rate > 0 ? 'Finance Division increase' : 'No increase'),
+      rate: isPreRates ? null : rate,
+      pension: Math.round(vetPension),
+      phase: 1,
+      note: isPreRates
+        ? 'Finance Division OMs before 1994 unavailable — assumed 0%'
+        : (RATE_REFERENCES[year] || (rate === 0 ? 'No increase' : '')),
+      unconfirmed: isPreRates || UNCONFIRMED_YEARS.has(year),
+      preRates: isPreRates
+    });
+  }
+
+  const veteranPensionAtDeath = Math.round(vetPension);
+  const familyPensionStart    = Math.round(veteranPensionAtDeath * familyPensionPct);
+
+  // ── Phase 2: family pension trail ────────────────────────
+  let famPension = familyPensionStart;
+
+  phase2Trail.push({
+    year: deathYear, month: deathMonth,
+    event: `Veteran died — family pension starts (${(familyPensionPct * 100).toFixed(0)}%)`,
+    rate: null,
+    pension: familyPensionStart,
+    phase: 2,
+    isTransition: true,
+    note: `${(familyPensionPct * 100).toFixed(0)}% of veteran's pension at death (Rs. ${veteranPensionAtDeath.toLocaleString('en-PK')})`
+  });
+
+  for (let year = deathYear + 1; year <= CURRENT_YEAR; year++) {
+    const rate = PENSION_RATES[year] ?? 0;
+
+    if (rate > 0) {
+      const base = Math.max(0, famPension - medicalAllowance);
+      famPension  = medicalAllowance + base * (1 + rate);
+    }
+
+    phase2Trail.push({
+      year,
+      event: rate > 0 ? 'Finance Division increase' : 'No increase',
+      rate,
+      pension: Math.round(famPension),
+      phase: 2,
+      note: RATE_REFERENCES[year] || (rate === 0 ? 'No increase' : ''),
+      unconfirmed: UNCONFIRMED_YEARS.has(year)
+    });
+  }
+
+  const correctPension    = Math.round(famPension);
+  const difference        = correctPension - currentPension;
+  const TOLERANCE         = 100;
+  const status            = difference > TOLERANCE  ? 'underpaid'
+                          : difference < -TOLERANCE ? 'overpaid'
+                          : 'correct';
+  const monthlyShortfall  = Math.max(0, difference);
+  const annualShortfall   = monthlyShortfall * 12;
+
+  return {
+    pensionerType: 'family',
+    twoPhase: true,
+    veteranPensionAtDeath,
+    familyPensionStart,
+    familyPensionPct,
+    phase1Trail,
+    phase2Trail,
+    trail: [...phase1Trail, ...phase2Trail],
+    correctPension,
+    currentPension,
+    difference,
+    status,
+    monthlyShortfall,
+    annualShortfall,
+    retainedPension: familyPensionStart,
+    grossPension,
+    commutedAmount: 0,
+    medicalAllowance,
+    pre1994Warning,
+    restoInfo: null,
+    effectiveRestoreYear: null,
+    effectiveRestoreMonth: null,
+    restorationDelay: null,
+    lumpSumCalc: null
+  };
 }
 
 // Maximum commutation % allowed by retirement date

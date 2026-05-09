@@ -108,8 +108,8 @@
               <span data-en="Family Pensioner (widow / dependent)" data-ur="خاندانی پنشنر (بیوہ / انحصار کنندہ)">Family Pensioner (widow / dependent)</span>
             </label>
           </div>
-          <p class="field-hint family-hint hidden" data-en="Family pension = 50% of the veteran's gross pension. Commutation and restoration do not apply." data-ur="خاندانی پنشن = سابق فوجی کی مجموعی پنشن کا 50%۔ کمیوٹیشن اور بحالی لاگو نہیں ہوتی۔">
-            Family pension = 50% of the veteran's gross pension. Commutation and restoration do not apply.
+          <p class="field-hint family-hint hidden" data-en="For family pension: enter the veteran's date of death / family pension start below. In Step 2 you can optionally enter the veteran's original pension for full two-phase verification." data-ur="خاندانی پنشن کے لیے: نیچے سابق فوجی کی وفات کی تاریخ / خاندانی پنشن شروع درج کریں۔ مرحلہ 2 میں مکمل دو مرحلہ تصدیق کے لیے سابق فوجی کی اصل پنشن درج کر سکتے ہیں۔">
+            For family pension: enter the veteran's date of death / family pension start below. In Step 2 you can optionally enter the veteran's original pension for full two-phase verification.
           </p>
         </div>
 
@@ -141,7 +141,7 @@
         </div>
 
         <div class="field-group">
-          <label class="retire-date-label" data-en="Date of Retirement" data-ur="ریٹائرمنٹ کی تاریخ">Date of Retirement</label>
+          <label class="retire-date-label" data-en="Date of Retirement" data-ur="ریٹائرمنٹ کی تاریخ / ریٹائرمنٹ کی تاریخ">Date of Retirement</label>
           <div class="date-row">
             <select id="retireMonth" required>
               <option value="" data-en="Month" data-ur="مہینہ">Month</option>
@@ -160,38 +160,109 @@
 
       <!-- ── STEP 2 — Pension Details ── -->
       <div class="form-step" id="step2">
-        <h2 class="step-title" data-en="Step 2 — Pension at Retirement" data-ur="مرحلہ 2 — ریٹائرمنٹ پر پنشن">Step 2 — Pension at Retirement</h2>
+        <h2 class="step-title" data-en="Step 2 — Pension Details" data-ur="مرحلہ 2 — پنشن کی تفصیلات">Step 2 — Pension Details</h2>
 
-        <div class="field-group">
-          <label data-en="Do you know your gross pension at retirement?" data-ur="کیا آپ کو اپنی مجموعی پنشن معلوم ہے؟">Do you know your gross pension at retirement?</label>
-          <div class="radio-row">
-            <label class="radio-label">
-              <input type="radio" name="knowPension" value="yes" checked onchange="togglePensionMode(this.value)" />
-              <span data-en="Yes — I know it" data-ur="ہاں — معلوم ہے">Yes — I know it</span>
-            </label>
-            <label class="radio-label">
-              <input type="radio" name="knowPension" value="no" onchange="togglePensionMode(this.value)" />
-              <span data-en="No — use current pension" data-ur="نہیں — موجودہ پنشن استعمال کریں">No — use current pension</span>
-            </label>
-          </div>
-        </div>
-
-        <div id="grossPensionSection">
+        <!-- PRIMARY pensioner fields -->
+        <div id="primaryStep2">
           <div class="field-group">
-            <label class="gross-pension-label" data-en="Gross Pension at Retirement (Rs.)" data-ur="مجموعی پنشن بوقت ریٹائرمنٹ (روپے)">Gross Pension at Retirement (Rs.)</label>
-            <input type="number" id="grossPension" placeholder="e.g. 2442" min="1" oninput="calcCommutedAmount()" />
-            <p class="field-hint" data-en="Total pension shown in your PPO or pension book — before commutation." data-ur="آپ کے پی پی او یا پنشن بک میں درج مجموعی پنشن — کمیوٹیشن سے پہلے۔">Total pension shown in your PPO or pension book — before commutation.</p>
+            <label data-en="Do you know your gross pension at retirement?" data-ur="کیا آپ کو اپنی مجموعی پنشن معلوم ہے؟">Do you know your gross pension at retirement?</label>
+            <div class="radio-row">
+              <label class="radio-label">
+                <input type="radio" name="knowPension" value="yes" checked onchange="togglePensionMode(this.value)" />
+                <span data-en="Yes — I know it" data-ur="ہاں — معلوم ہے">Yes — I know it</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="knowPension" value="no" onchange="togglePensionMode(this.value)" />
+                <span data-en="No — use current pension" data-ur="نہیں — موجودہ پنشن استعمال کریں">No — use current pension</span>
+              </label>
+            </div>
           </div>
-        </div>
 
-        <div id="currentPensionSection" class="hidden">
+          <div id="grossPensionSection">
+            <div class="field-group">
+              <label class="gross-pension-label" data-en="Gross Pension at Retirement (Rs.)" data-ur="مجموعی پنشن بوقت ریٹائرمنٹ (روپے)">Gross Pension at Retirement (Rs.)</label>
+              <input type="number" id="grossPension" placeholder="e.g. 2442" min="1" oninput="calcCommutedAmount()" />
+              <p class="field-hint" data-en="Total pension shown in your PPO or pension book — before commutation." data-ur="آپ کے پی پی او یا پنشن بک میں درج مجموعی پنشن — کمیوٹیشن سے پہلے۔">Total pension shown in your PPO or pension book — before commutation.</p>
+            </div>
+          </div>
+
+          <div id="currentPensionSection" class="hidden">
+            <div class="field-group">
+              <label data-en="Current Pension Being Drawn (Rs.) — for reverse calculation" data-ur="موجودہ پنشن (روپے) — الٹا حساب کے لیے">Current Pension Being Drawn (Rs.) — for reverse calculation</label>
+              <input type="number" id="currentPensionAlt" placeholder="e.g. 68000" min="1" />
+              <p class="field-hint" data-en="We will reverse-calculate your original pension from this." data-ur="ہم اس سے آپ کی اصل پنشن کا الٹا حساب لگائیں گے۔">We will reverse-calculate your original pension from this.</p>
+            </div>
+          </div>
+        </div><!-- /primaryStep2 -->
+
+        <!-- FAMILY pensioner fields -->
+        <div id="familyStep2" class="hidden">
+
+          <div class="info-box accent" style="margin-bottom:14px">
+            <strong data-en="Full Verification (Recommended)" data-ur="مکمل تصدیق (تجویز کردہ)">Full Verification (Recommended)</strong>
+            <p style="margin:4px 0 0" data-en="If you know the veteran's original retirement pension, we trace the full trail: veteran's pension from retirement → death, then family pension from death → today. This verifies whether the initial family pension amount was also correct." data-ur="اگر آپ سابق فوجی کی اصل ریٹائرمنٹ پنشن جانتے ہیں تو ہم مکمل راستہ بناتے ہیں: ریٹائرمنٹ سے وفات تک سابق فوجی کی پنشن، پھر وفات سے آج تک خاندانی پنشن۔">
+              If you know the veteran's original retirement pension, we trace the full trail: veteran's pension from retirement → death, then family pension from death → today. This verifies whether the initial family pension amount was also correct.
+            </p>
+          </div>
+
           <div class="field-group">
-            <label data-en="Current Pension Being Drawn (Rs.) — for reverse calculation" data-ur="موجودہ پنشن (روپے) — الٹا حساب کے لیے">Current Pension Being Drawn (Rs.) — for reverse calculation</label>
-            <input type="number" id="currentPensionAlt" placeholder="e.g. 68000" min="1" />
-            <p class="field-hint" data-en="We will reverse-calculate your original pension from this." data-ur="ہم اس سے آپ کی اصل پنشن کا الٹا حساب لگائیں گے۔">We will reverse-calculate your original pension from this.</p>
+            <label data-en="Verification Mode" data-ur="تصدیق کا طریقہ">Verification Mode</label>
+            <div class="radio-row">
+              <label class="radio-label">
+                <input type="radio" name="familyVerifyMode" value="twoPhase" onchange="onFamilyModeChange(this.value)" />
+                <span data-en="Full — I know the veteran's original pension" data-ur="مکمل — سابق فوجی کی اصل پنشن معلوم ہے">Full — I know the veteran's original pension</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="familyVerifyMode" value="singlePhase" checked onchange="onFamilyModeChange(this.value)" />
+                <span data-en="Basic — use family pension at grant date" data-ur="بنیادی — منظوری کی تاریخ پر خاندانی پنشن استعمال کریں">Basic — use family pension at grant date</span>
+              </label>
+            </div>
           </div>
-        </div>
 
+          <!-- Two-phase: veteran's original details -->
+          <div id="veteranDetailsSection" class="hidden">
+            <div class="field-group">
+              <label data-en="Veteran's Date of Military Retirement" data-ur="سابق فوجی کی فوجی ریٹائرمنٹ کی تاریخ">Veteran's Date of Military Retirement</label>
+              <div class="date-row">
+                <select id="veteranRetireMonth">
+                  <option value="" data-en="Month" data-ur="مہینہ">Month</option>
+                </select>
+                <select id="veteranRetireYear">
+                  <option value="" data-en="Year" data-ur="سال">Year</option>
+                </select>
+              </div>
+              <p class="field-hint" data-en="When did the veteran retire from military service?" data-ur="سابق فوجی نے فوجی سروس سے کب ریٹائرمنٹ لی؟">When did the veteran retire from military service?</p>
+            </div>
+
+            <div class="field-group">
+              <label data-en="Veteran's Gross Pension at Retirement (Rs.)" data-ur="سابق فوجی کی مجموعی پنشن بوقت ریٹائرمنٹ (روپے)">Veteran's Gross Pension at Retirement (Rs.)</label>
+              <input type="number" id="veteranGrossPension" placeholder="e.g. 2442" min="1" />
+              <p class="field-hint" data-en="From the veteran's PPO — total gross pension before any commutation." data-ur="سابق فوجی کے پی پی او سے — کمیوٹیشن سے پہلے مجموعی پنشن۔">From the veteran's PPO — total gross pension before any commutation.</p>
+            </div>
+          </div><!-- /veteranDetailsSection -->
+
+          <!-- Single-phase: family pension at grant date (optional) -->
+          <div id="familyGrantSection">
+            <div class="field-group">
+              <label data-en="Family Pension at Grant Date (Rs.) — optional" data-ur="منظوری کی تاریخ پر خاندانی پنشن (روپے) — اختیاری">Family Pension at Grant Date (Rs.) — optional</label>
+              <input type="number" id="familyPensionGrant" placeholder="Leave blank to auto-estimate" min="1" />
+              <p class="field-hint" data-en="The initial family pension amount when first sanctioned. If unknown, leave blank — we'll estimate from current pension." data-ur="پہلی بار منظور شدہ خاندانی پنشن کی رقم۔ اگر معلوم نہ ہو تو خالی چھوڑیں — ہم موجودہ پنشن سے تخمینہ لگائیں گے۔">The initial family pension amount when first sanctioned. Leave blank to auto-estimate from current pension.</p>
+            </div>
+          </div><!-- /familyGrantSection -->
+
+          <!-- Family pension rate — always shown for family -->
+          <div class="field-group">
+            <label data-en="Family Pension Rate" data-ur="خاندانی پنشن کی شرح">Family Pension Rate</label>
+            <select id="familyPensionPct">
+              <option value="0.50" data-en="50% — Standard (widow / dependent)" data-ur="50% — معیاری (بیوہ / انحصار کنندہ)">50% — Standard (widow / dependent)</option>
+              <option value="0.75" data-en="75% — War widow / Shaheed / killed in action" data-ur="75% — جنگی بیوہ / شہید / میدان جنگ میں شہید">75% — War widow / Shaheed / killed in action</option>
+            </select>
+            <p class="field-hint" data-en="Standard family pension is 50%. Widows of Shaheed / killed-in-action may be entitled to 75%." data-ur="معیاری خاندانی پنشن 50% ہے۔ شہداء / میدان جنگ میں شہید کی بیوائیں 75% کی حق دار ہو سکتی ہیں۔">Standard family pension is 50%. Widows of Shaheed / killed-in-action may be entitled to 75%.</p>
+          </div>
+
+        </div><!-- /familyStep2 -->
+
+        <!-- Always visible: current pension + medical allowance -->
         <div class="field-group">
           <label data-en="Current Pension Being Drawn (Rs.)" data-ur="موجودہ پنشن جو مل رہی ہے (روپے)">Current Pension Being Drawn (Rs.)</label>
           <input type="number" id="currentPension" placeholder="e.g. 68000" min="1" />
@@ -361,6 +432,9 @@
       <div class="result-summary" id="resultSummary"></div>
 
       <div class="restoration-result hidden" id="restorationResult"></div>
+
+      <!-- Two-phase family pension summary (shown when twoPhase===true) -->
+      <div class="two-phase-result hidden" id="twoPhaseResult"></div>
 
       <!-- CTA -->
       <div class="result-cta">
